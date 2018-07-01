@@ -14,14 +14,10 @@ const pg = require('pg');
 
 // Initialise postgres client
 const config = {
-  user: 'ck',
+  user: 'drillaxholic',
   host: '127.0.0.1',
-  database: 'pokemons',
+  database: 'pokemon-go',
   port: 5432,
-};
-
-if (config.user === 'ck') {
-	throw new Error("====== UPDATE YOUR DATABASE CONFIGURATION =======");
 };
 
 const pool = new pg.Pool(config);
@@ -120,7 +116,7 @@ const editPokemonForm = (request, response) => {
       console.log('Query result:', result);
 
       // redirect to home page
-      response.render( 'edit', {pokemon: result.rows[0]} );
+      response.render( 'Edit', {pokemon: result.rows[0]} );
     }
   });
 }
@@ -130,7 +126,6 @@ const updatePokemon = (request, response) => {
   let pokemon = request.body;
   const queryString = 'UPDATE "pokemon" SET "num"=($1), "name"=($2), "img"=($3), "height"=($4), "weight"=($5) WHERE "id"=($6)';
   const values = [pokemon.num, pokemon.name, pokemon.img, pokemon.height, pokemon.weight, id];
-  console.log(queryString);
   pool.query(queryString, values, (err, result) => {
     if (err) {
       console.error('Query error:', err.stack);
@@ -148,8 +143,31 @@ const deletePokemonForm = (request, response) => {
 }
 
 const deletePokemon = (request, response) => {
-  response.send("COMPLETE ME");
+  let id = request.params['id']; 
+  const queryString = 'DELETE FROM pokemon WHERE id =' + id + ';';
+  pool.query(queryString, (err, result) => {
+    if (err) {
+      console.error('Query error:', err.stack);
+    } else {
+      console.log('Query result:', result);
+
+      // redirect to home page
+      response.redirect('/');
+    }
+  })
 }
+
+  // })
+  // const queryString = 'DELETE FROM pokemon WHERE id=' + request.body.rows[0].id;
+  // pool.query(queryString, (err, result) => {
+  //   if (err) {
+  //     console.error('Query error:', err.stack);
+  //   } else {
+  //     // redirect to home page
+  //     response.redirect('/');
+  //   }
+  // });
+// }
 /**
  * ===================================
  * Routes
